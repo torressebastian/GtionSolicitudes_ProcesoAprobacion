@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/" >
+  <Module Name="WP_BotoneraSolicitud" List="113" Url="_catalogs/wp">
+    <File Path="WP_BotoneraSolicitud\WP_BotoneraSolicitud.webpart" Url="SolicitudesDiseno_Solicitudes_WP_BotoneraSolicitud.webpart" Type="GhostableInLibrary" >
+      <Property Name="Group" Value="Custom" />
+    </File>
+  </Module>
+</Elements>

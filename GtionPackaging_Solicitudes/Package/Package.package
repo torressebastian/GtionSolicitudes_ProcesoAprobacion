@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="9defff8c-2926-4253-b1db-0f0b79b5aa58" solutionId="9defff8c-2926-4253-b1db-0f0b79b5aa58" resetWebServer="false" sharePointProductVersion="16.0" name="GtionPackaging_Solicitudes" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+  <features>
+    <featureReference itemId="ecf3e809-1956-47d9-865c-f6955a085dca" />
+    <featureReference itemId="c0049f6a-8184-41d2-8c91-d1e78491c730" />
+  </features>
+  <projectItems>
+    <projectItemReference itemId="162ea795-28c9-4e1f-9379-61371d2fe90a" />
+  </projectItems>
+</package>

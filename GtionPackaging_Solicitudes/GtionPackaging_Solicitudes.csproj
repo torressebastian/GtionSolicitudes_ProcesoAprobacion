@@ -1,0 +1,176 @@
+﻿<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{868832C0-909B-4674-9076-CE13516B4650}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GtionPackaging_Solicitudes</RootNamespace>
+    <AssemblyName>GtionPackaging_Solicitudes</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetOfficeVersion>16.0</TargetOfficeVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <MinimumOfficeToolsVersion>14.0</MinimumOfficeToolsVersion>
+    <SandboxedSolution>False</SandboxedSolution>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.SharePoint" />
+    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Funciones_Comunes.cs" />
+    <Compile Include="Layouts\SolicitudesDiseno\AprobacionSolicitud.aspx.cs">
+      <DependentUpon>AprobacionSolicitud.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\AprobacionSolicitud.aspx.designer.cs">
+      <DependentUpon>AprobacionSolicitud.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\AsignarTareaSolicitud.aspx.cs">
+      <DependentUpon>AsignarTareaSolicitud.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\AsignarTareaSolicitud.aspx.designer.cs">
+      <DependentUpon>AsignarTareaSolicitud.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\CancelarProceso.aspx.cs">
+      <DependentUpon>CancelarProceso.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\CancelarProceso.aspx.designer.cs">
+      <DependentUpon>CancelarProceso.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\ProcesandoSolicitud.aspx.cs">
+      <DependentUpon>ProcesandoSolicitud.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\ProcesandoSolicitud.aspx.designer.cs">
+      <DependentUpon>ProcesandoSolicitud.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\SolicitudProductoMaterialModif.aspx.cs">
+      <DependentUpon>SolicitudProductoMaterialModif.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\SolicitudProductoMaterialModif.aspx.designer.cs">
+      <DependentUpon>SolicitudProductoMaterialModif.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\SolicitudProductoMaterial.aspx.cs">
+      <DependentUpon>SolicitudProductoMaterial.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\SolicitudProductoMaterial.aspx.designer.cs">
+      <DependentUpon>SolicitudProductoMaterial.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\SolicitudReenviar.aspx.cs">
+      <DependentUpon>SolicitudReenviar.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\SolicitudReenviar.aspx.designer.cs">
+      <DependentUpon>SolicitudReenviar.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TareasSolicitudes\TareasSolicitudes.cs" />
+    <Compile Include="WP_BotoneraSolicitud\WP_BotoneraSolicitud.ascx.cs">
+      <DependentUpon>WP_BotoneraSolicitud.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WP_BotoneraSolicitud\WP_BotoneraSolicitud.ascx.g.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WP_BotoneraSolicitud.ascx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Features\Feature1\Feature1.feature">
+      <FeatureId>{ecf3e809-1956-47d9-865c-f6955a085dca}</FeatureId>
+    </None>
+    <None Include="Features\GtionPackaging_Solicitudes\GtionPackaging_Solicitudes.feature">
+      <FeatureId>{c0049f6a-8184-41d2-8c91-d1e78491c730}</FeatureId>
+    </None>
+    <None Include="key.snk" />
+    <None Include="Layouts\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{162ea795-28c9-4e1f-9379-61371d2fe90a}</SharePointProjectItemId>
+    </None>
+    <None Include="Package\Package.package">
+      <PackageId>{9defff8c-2926-4253-b1db-0f0b79b5aa58}</PackageId>
+    </None>
+    <None Include="Package\Package.Template.xml">
+      <DependentUpon>Package.package</DependentUpon>
+    </None>
+    <None Include="TareasSolicitudes\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{45d2cfa4-8f3d-40c8-9b64-009a54625f03}</SharePointProjectItemId>
+    </None>
+    <None Include="WP_BotoneraSolicitud\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{5988c6cd-28a0-4309-b2f1-3cd0ea2d89ae}</SharePointProjectItemId>
+    </None>
+    <None Include="WP_BotoneraSolicitud\WP_BotoneraSolicitud.webpart">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Features\Feature1\Feature1.Template.xml">
+      <DependentUpon>Feature1.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\GtionPackaging_Solicitudes\GtionPackaging_Solicitudes.Template.xml">
+      <DependentUpon>GtionPackaging_Solicitudes.feature</DependentUpon>
+    </Content>
+    <Content Include="Layouts\SolicitudesDiseno\AprobacionSolicitud.aspx" />
+    <Content Include="Layouts\SolicitudesDiseno\AsignarTareaSolicitud.aspx" />
+    <Content Include="Layouts\SolicitudesDiseno\CancelarProceso.aspx" />
+    <Content Include="Layouts\SolicitudesDiseno\ProcesandoSolicitud.aspx" />
+    <Content Include="Layouts\SolicitudesDiseno\SolicitudProductoMaterialModif.aspx" />
+    <Content Include="Layouts\SolicitudesDiseno\SolicitudProductoMaterial.aspx" />
+    <Content Include="Layouts\SolicitudesDiseno\SolicitudReenviar.aspx" />
+    <Content Include="TareasSolicitudes\Elements.xml" />
+    <Content Include="WP_BotoneraSolicitud\Elements.xml" />
+    <Content Include="WP_BotoneraSolicitud\WP_BotoneraSolicitud.ascx">
+      <Generator>SharePointWebPartCodeGenerator</Generator>
+      <LastGenOutput>WP_BotoneraSolicitud.ascx.g.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
+</Project>
