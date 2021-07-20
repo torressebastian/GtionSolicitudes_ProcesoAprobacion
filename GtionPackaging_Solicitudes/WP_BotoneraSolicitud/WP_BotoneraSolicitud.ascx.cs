@@ -35,6 +35,7 @@ namespace SolicitudesDiseno_Solicitudes.WP_BotoneraSolicitud
             if (bPuedeIniciar("Modificación de Archivos (Planificación)") == false) { cellPlanificacion.Visible = false; }
             if (bPuedeIniciar("Modificación de Archivos (Registro)") == false) { cellRegistro.Visible = false; }
             if (bPuedeIniciar("Modificación de Archivos (Internacional)") == false) { cellInternacional.Visible = false; }
+            if (bPuedeIniciar("Discontinuos") == false) { cellDiscontinuos.Visible = false; }
 
         }
 
@@ -138,6 +139,11 @@ namespace SolicitudesDiseno_Solicitudes.WP_BotoneraSolicitud
         protected void btnModInternacional_Click(object sender, EventArgs e)
         {
             Context.Response.Redirect(SPContext.Current.Site.Url + "/SolicitudesDiseno/_layouts/15/start.aspx#/Lists/Solicitudes/NewForm.aspx?ContentTypeId=" + strGuidTipoContenido("Modificación de Archivos (Internacional)"));
+        }
+
+        protected void btnDiscontinuos_Click(object sender, EventArgs e)
+        {
+            Context.Response.Redirect(SPContext.Current.Site.Url + "/SolicitudesDiseno/_layouts/15/start.aspx#/Lists/Solicitudes/NewForm.aspx?ContentTypeId=" + strGuidTipoContenido("Discontinuos"));
         }
     }
 }

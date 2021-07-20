@@ -73,7 +73,16 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                             }
                         }
 
-                        
+                        if (strEstadoSolicitud == "Reinicio Pendiente")
+                        {
+                            bInicioProceso = true;
+                        }
+
+                        if ((txtTipoDocumento.Text == "Discontinuos") && (Funciones_Comunes.UsuarioGrupo(currentUser, Funciones_Comunes.iDevolverIdSector("Registro Internacional")) == true))
+                        {
+                            bInicioProceso = true;
+                        }
+
 
                         if (bInicioProceso == false) {
                             strMotivo  = "";
@@ -195,6 +204,16 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                 CustomersGridView.Columns[2].HeaderText = "Producto / Material";
             }
 
+            if (txtTipoDocumento.Text != "Discontinuos")
+            {
+                CustomersGridView.Columns[6].Visible = false;
+                CustomersGridView.Columns[7].Visible = false;
+                CustomersGridView.Columns[8].Visible = false;
+                cellRecursosUtilizados.Visible = false;
+                cellCantidadBlister.Visible = false;
+                cellCriterioUnificacion.Visible = false;
+            }
+
             //LimpiarPanelProducto();
 
             if (strEstadoSolicitud == "Pendiente Inicio Packaging" || strEstadoSolicitud == "Cancelado" || strEstadoSolicitud == "Completado")
@@ -246,11 +265,23 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                 }
                 else
                 {
+
+
                     btnAddProducto.Enabled = false;
-                }
+                        if (txtTipoDocumento.Text == "Discontinuos")
+                        {
+                            
+                            if (Funciones_Comunes.UsuarioGrupo(currentUser, Funciones_Comunes.iDevolverIdSector("Registro Internacional")) == true)
+                            {
+
+                                btnAddProducto.Enabled = true;
+                            }
+                        }
+                    }
             }
             else
             {
+
                 btnAddProducto.Enabled = false;
             }
             }
@@ -274,9 +305,13 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                     if (itmSolProducto["Modificación"] is null) { txtModificacion.Text = ""; } else { txtModificacion.Text = itmSolProducto["Modificación"].ToString(); }
                     if (itmSolProducto["Motivo"] is null) { txtMotivo.Text = ""; } else { txtMotivo.Text = itmSolProducto["Motivo"].ToString(); }
                     if (itmSolProducto["Datos de Cobertura"] is null) { txtDatosCobertura.Text = ""; } else { txtDatosCobertura.Text = itmSolProducto["Datos de Cobertura"].ToString(); }
-                    
+                    if (itmSolProducto["Recursos utilizados"] is null) { txtRecursosUtilizados.Text = ""; } else { txtRecursosUtilizados.Text = itmSolProducto["Recursos utilizados"].ToString(); }
+                    if (itmSolProducto["Cantidad Blisters"] is null) { txtCantidadBlister.Text = ""; } else { txtCantidadBlister.Text = itmSolProducto["Cantidad Blisters"].ToString(); }
+                    if (itmSolProducto["Criterio Unificación"] is null) { txtCriterioUnificacion.Text = ""; } else { txtCriterioUnificacion.Text = itmSolProducto["Criterio Unificación"].ToString(); }
+
+
                 }
-                
+
                 ArmarPanelMateriales(0);
 
                 btnAddProducto.Enabled = false;
@@ -342,6 +377,18 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                 {
                     btnAddProducto.Enabled = false;
                     btnDelProducto.Enabled = false;
+
+                        if (txtTipoDocumento.Text  == "Discontinuos")
+                        {
+                            SPUser currentUser = SPContext.Current.Web.CurrentUser;
+                            if (Funciones_Comunes.UsuarioGrupo(currentUser, Funciones_Comunes.iDevolverIdSector("Registro Internacional")) == true)
+                            {
+                                
+                                btnUpdProducto.Enabled = true;
+                                btnDelProducto.Enabled = true;
+                            }
+                         }
+
                 }
                 }
 
@@ -365,6 +412,9 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                     addListProducto["Código SAP"] = txtProductoCodigoSAP.Text;
                     addListProducto["Modificación"] = txtModificacion.Text;
                     addListProducto["Motivo"] = txtMotivo.Text;
+                    addListProducto["Recursos utilizados"] = txtRecursosUtilizados.Text;
+                    addListProducto["Cantidad Blisters"] = txtCantidadBlister.Text;
+                    addListProducto["Criterio Unificación"] = txtCriterioUnificacion.Text;
                     addListProducto["Datos de Cobertura"] = txtDatosCobertura.Text;
                     addListProducto.Update();
                     System.Threading.Thread.Sleep(2500);
@@ -431,6 +481,9 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                     addListProducto["Modificación"] = txtModificacion.Text;
                     addListProducto["Motivo"] = txtMotivo.Text;
                     addListProducto["Datos de Cobertura"] = txtDatosCobertura.Text;
+                    addListProducto["Recursos utilizados"] = txtRecursosUtilizados.Text;
+                    addListProducto["Cantidad Blisters"] = txtCantidadBlister.Text;
+                    addListProducto["Criterio Unificación"] = txtCriterioUnificacion.Text;
                     addListProducto.Update();
                     System.Threading.Thread.Sleep(2500);
 
@@ -471,6 +524,9 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
             txtModificacion.Text = strModificacion;
             txtMotivo.Text = strMotivo;
             txtDatosCobertura.Text = "";
+            txtRecursosUtilizados.Text = "";
+            txtCantidadBlister.Text = "";
+            txtCriterioUnificacion.Text = "";
             lblMensajeErrorProducto.Text = "";
             lblMensajeErrorProducto.Visible = false;
 
@@ -538,6 +594,9 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
             if (bPuedeEditar("Motivo") == true) { txtMotivo.Enabled = true; lblMotivo.ForeColor = System.Drawing.Color.Red; } else { txtMotivo.Enabled = false; }
             if (bPuedeEditar("Código SAP") == true) { txtProductoCodigoSAP.Enabled = true; lblProductoCodigoSAP.ForeColor = System.Drawing.Color.Red; } else { txtProductoCodigoSAP.Enabled = false; }
             if (bPuedeEditar("Datos de Cobertura") == true) { txtDatosCobertura.Enabled = true; lblDatosCobertura.ForeColor = System.Drawing.Color.Red; } else { txtDatosCobertura.Enabled = false; }
+            if (bPuedeEditar("Recursos utilizados") == true) { txtRecursosUtilizados.Enabled = true; lblRecursosUtilizados.ForeColor = System.Drawing.Color.Red; } else { txtRecursosUtilizados.Enabled = false; }
+            if (bPuedeEditar("Cantidad Blisters") == true) { txtCantidadBlister.Enabled = true; lblCantidadBlister.ForeColor = System.Drawing.Color.Red; } else { txtCantidadBlister.Enabled = false; }
+            if (bPuedeEditar("Criterio Unificación") == true) { txtCriterioUnificacion.Enabled = true; lblCriterioUnificacion.ForeColor = System.Drawing.Color.Red; } else { txtCriterioUnificacion.Enabled = false; }
 
 
         }
@@ -564,7 +623,7 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                         SPListItemCollection lstList = lConfiguracionProductoSector.GetItems(query);
                         foreach (SPListItem itmSector in lstList)
                         {
-                            
+                            if (itmSector[sTipoSolicitud] != null) { 
                             SPFieldLookupValueCollection lkSectorAlta = new SPFieldLookupValueCollection(itmSector[sTipoSolicitud].ToString());
 
                             foreach (SPFieldLookupValue itmSectorAlta in lkSectorAlta)
@@ -573,6 +632,7 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                                 if (bResult == false) { 
                                     bResult = Funciones_Comunes.UsuarioGrupo(currentUser, idSectorAsociado);
                                 }
+                            }
                             }
                         }
                         
@@ -592,6 +652,9 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
             if (txtMotivo.Enabled == true){ if( txtMotivo.Text == "") { bAuxResultado = false;} }
             if (txtProductoCodigoSAP.Enabled == true) { if (txtProductoCodigoSAP.Text == "") { bAuxResultado = false; } }
             if (txtDatosCobertura.Enabled == true) { if (txtDatosCobertura.Text == "") { bAuxResultado = false; } }
+            if (txtRecursosUtilizados.Enabled == true) { if (txtRecursosUtilizados.Text == "") { bAuxResultado = false; } }
+            if (txtCantidadBlister.Enabled == true) { if (txtCantidadBlister.Text == "") { bAuxResultado = false; } }
+            if (txtCriterioUnificacion.Enabled == true) { if (txtCriterioUnificacion.Text == "") { bAuxResultado = false; } }
             return bAuxResultado;
 
         }
@@ -667,6 +730,19 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                     imgSiguienteMaterial.Visible = true;
                 }
 
+                if (GridViewMateriales.Rows.Count != 0)
+                {
+                    foreach (GridViewRow row in GridViewMateriales.Rows)
+                    {
+                        if (row.Cells[16].Text.ToString() == "1")
+                        {
+                            row.BackColor = System.Drawing.Color.Orange;
+                            row.Cells[16].ForeColor = System.Drawing.Color.Orange;
+                            row.Cells[0].ForeColor = System.Drawing.Color.Orange;
+                        }
+                    }
+                }
+
                 
             }
 
@@ -724,6 +800,8 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
         {
             if (e.CommandName == "EditarMaterial")
             {
+                LimpiarPanelMateriales();
+                    
                 lblMensajeErrorMaterial.Visible = false;
                 int index = Convert.ToInt32(e.CommandArgument);
                 GridViewRow row = GridViewMateriales.Rows[index];
@@ -1062,40 +1140,44 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                 }
             }
             if (bResult == true) {
-                SPQuery qryTareas = new SPQuery();
-                SPList lstList;
-                String strQuery = "";
-                lstList = SPContext.Current.Web.Lists["Solicitud - Producto Material"];
-                qryTareas = new SPQuery(lstList.Views["Todos los elementos"]);
-
-                String sOrden = string.Format("<OrderBy><FieldRef Name='{0}' Ascending='{1}' /></OrderBy>", "ID", "False");
-                strQuery = "<Eq><FieldRef Name='C_x00f3_digo_x0020_SAP' /><Value Type='Text'>" + txtMaterialCodigoSAP.Text.ToString().TrimEnd() + "</Value></Eq>";
-
-                if (!string.IsNullOrEmpty(strQuery))
+                if (txtMaterialCodigoSAP.Text.ToString().TrimEnd() != "N/A")
                 {
-                    strQuery = "<Where>" + strQuery + "</Where>";
-                }
+                    SPQuery qryTareas = new SPQuery();
+                    SPList lstList;
+                    String strQuery = "";
+                    lstList = SPContext.Current.Web.Lists["Solicitud - Producto Material"];
+                    qryTareas = new SPQuery(lstList.Views["Todos los elementos"]);
 
-                qryTareas.Query = strQuery;
-                qryTareas.RowLimit = 500;
+                    String sOrden = string.Format("<OrderBy><FieldRef Name='{0}' Ascending='{1}' /></OrderBy>", "ID", "False");
+                    strQuery = "<Eq><FieldRef Name='C_x00f3_digo_x0020_SAP' /><Value Type='Text'>" + txtMaterialCodigoSAP.Text.ToString().TrimEnd() + "</Value></Eq>";
 
-                SPListItemCollection lstMateriales = lstList.GetItems(qryTareas);
-                foreach (SPListItem str in lstMateriales)
-                {
-                    if (Convert.ToInt32(str["Solicitud"].ToString().Split(';')[0].ToString()) != idDocument) {
-                        SPList lSolicitudes = SPContext.Current.Web.Lists["Solicitudes"];
-                        SPListItem itmSolicitud = lSolicitudes.GetItemById(Convert.ToInt32(str["Solicitud"].ToString().Split(';')[0].ToString()));
-                        if (itmSolicitud["Estado"].ToString() != "Cancelado") {
-                            bResult = false;
-                            lblMensajeErrorMaterial.Text = "El Código SAP ingresado está asociado a otro material. Solicitud: " + itmSolicitud.Title.ToString();
-                            txtMaterialCodigoSAP.Focus();
-                            break;
-                        }
+                    if (!string.IsNullOrEmpty(strQuery))
+                    {
+                        strQuery = "<Where>" + strQuery + "</Where>";
                     }
-                        
 
+                    qryTareas.Query = strQuery;
+                    qryTareas.RowLimit = 500;
+
+                    SPListItemCollection lstMateriales = lstList.GetItems(qryTareas);
+                    foreach (SPListItem str in lstMateriales)
+                    {
+                        if (Convert.ToInt32(str["Solicitud"].ToString().Split(';')[0].ToString()) != idDocument)
+                        {
+                            SPList lSolicitudes = SPContext.Current.Web.Lists["Solicitudes"];
+                            SPListItem itmSolicitud = lSolicitudes.GetItemById(Convert.ToInt32(str["Solicitud"].ToString().Split(';')[0].ToString()));
+                            if (itmSolicitud["Estado"].ToString() != "Cancelado")
+                            {
+                                bResult = false;
+                                lblMensajeErrorMaterial.Text = "El Código SAP ingresado está asociado a otro material. Solicitud: " + itmSolicitud.Title.ToString();
+                                txtMaterialCodigoSAP.Focus();
+                                break;
+                            }
+                        }
+
+
+                    }
                 }
-
 
             }
 
@@ -1149,6 +1231,7 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
             string s1 = String.ToString();
             string newString = Regex.Replace(s1, @"#[\d]\d+([,;\s]+\d+)*;", string.Empty);
             newString = Regex.Replace(newString, "#", " ");
+            newString = Regex.Replace(newString, "-", "");
             return newString.ToString();
         }
     }

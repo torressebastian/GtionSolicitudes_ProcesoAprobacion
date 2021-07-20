@@ -30,6 +30,7 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
                         properties.ListItem["Procesado"] = "SI";
                         properties.ListItem["Fecha de Fin"] = DateTime.Now;
                         properties.ListItem.UpdateOverwriteVersion();
+                        properties.ListItem["Estado"] = "Completado";
                     }
                 }
 
@@ -68,10 +69,13 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
 
             if (sEstado == "Completado")
             {
-                
-                if (sCircuitoCompleto == "SI") { 
+
+                if (sCircuitoCompleto == "SI")
+                {
                     iTareaSiguiente = iTarea(iConfiguracionProceso, iSolicitudActual, properties);
-                } else {
+                }
+                else
+                {
                     iTareaSiguiente = iTareaPackaging(iConfiguracionProceso, iSolicitudActual, properties);
                 }
 
@@ -84,7 +88,8 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
                     SPList lSectores = properties.Web.Lists["Sectores"];
                     SPListItem imSector = lSectores.GetItemById(idSector);
 
-                    if (Convert.ToBoolean(itmConfiguracionProcesoSiguiente["Desgloce tarea"].ToString()) == false) {
+                    if (Convert.ToBoolean(itmConfiguracionProcesoSiguiente["Desgloce tarea"].ToString()) == false)
+                    {
 
                         // Inicializo la tarea siguiente
                         SPListItem itmTareaBitacora = lBitacora.AddItem();
@@ -99,7 +104,8 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
                         itmTareaBitacora["Sector"] = itmConfiguracionProcesoSiguiente["Sector"].ToString().Split('#')[1].ToString();
                         itmTareaBitacora.Update();
                     }
-                    else {
+                    else
+                    {
                         SPQuery qryMateriales = new SPQuery();
                         SPList lProductosMateriales = properties.Web.Lists["Solicitud - Producto Material"];
                         String strQuery = "";
@@ -107,7 +113,8 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
                         qryMateriales.Query = strQuery;
                         SPListItemCollection lstProductosMateriales = lProductosMateriales.GetItems(qryMateriales);
 
-                        foreach(SPListItem itmProductoMaterial in lstProductosMateriales) {
+                        foreach (SPListItem itmProductoMaterial in lstProductosMateriales)
+                        {
 
                             SPListItem itmProductoMaterialAux = lProductosMateriales.GetItemById(itmProductoMaterial.ID);
 
@@ -115,9 +122,10 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
 
 
 
-                            if (itmProductoMaterialAux["Código de Diseño"] != null) { 
-                            if (itmProductoMaterialAux["Código SAP"].ToString() != itmProductoMaterialAux["Código de Diseño"].ToString())
+                            if (itmProductoMaterialAux["Código de Diseño"] != null)
                             {
+                                if (itmProductoMaterialAux["Código SAP"].ToString() != itmProductoMaterialAux["Código de Diseño"].ToString())
+                                {
                                     // Si el código SAP Difiere del Código de Material, busco si existe SAP con igual Código de Diseño para la Solicitud, si existe, no proceso la tarea.
                                     SPQuery qryMaterialesDiseno = new SPQuery();
                                     SPList lProductosMaterialesDiseno = properties.Web.Lists["Solicitud - Producto Material"];
@@ -147,7 +155,8 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
                             }
 
 
-                            if (bProceso == true) { 
+                            if (bProceso == true)
+                            {
                                 SPListItem itmTareaBitacora = lBitacora.AddItem();
                                 itmTareaBitacora["Title"] = itmProductoMaterialAux["Código SAP"].ToString() + " - " + itmConfiguracionProcesoSiguiente.Title.ToString();
                                 itmTareaBitacora["Solicitud asociada"] = iSolicitudActual;
@@ -163,7 +172,7 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
                             }
                         }
 
-
+                        ActualizarMaterialesAjustes(iSolicitudActual, properties);
 
                     }
 
@@ -175,11 +184,19 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
                         itmDocumento["Estado"] = "Pendiente Inicio Packaging";
                         itmDocumento.Update();
                     }
-                    else {
+                    else
+                    {
                         SPList lDocumentos = properties.Web.Lists["Solicitudes"];
                         SPListItem itmDocumento = lDocumentos.GetItemById(iSolicitudActual);
                         itmDocumento["Sector actual"] = strSectorPendiente(iSolicitudActual, properties);
-                        itmDocumento["Estado"] = "En Curso";
+                        if (itmDocumento["Requiere Ajustes"] != null)
+                        {
+                            if (Convert.ToBoolean(itmDocumento["Requiere Ajustes"].ToString()) == true) { itmDocumento["Estado"] = "Ajustes En Curso"; } else { itmDocumento["Estado"] = "En Curso"; }
+                        }
+                        else
+                        {
+                            itmDocumento["Estado"] = "En Curso";
+                        }
                         itmDocumento.Update();
                     }
 
@@ -212,8 +229,11 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
                             queryDA.Query = string.Concat("<Where><And><Eq><FieldRef Name='Solicitud_x0020_asociada' LookupId='TRUE'/>", "<Value Type='Lookup'>", iSolicitudActual, "</Value></Eq><Eq><FieldRef Name='Estado'/><Value Type='Text'>Pendiente</Value></Eq></And></Where>");
                             SPListItemCollection itemColl = null;
                             itemColl = lBitacora.GetItems(queryDA);
+
                             
-                            if (itemColl.Count == 0) { 
+
+                            if (itemColl.Count == 0)
+                            {
                                 SPList lDocumentos = properties.Web.Lists["Solicitudes"];
                                 SPListItem itmDocumento = lDocumentos.GetItemById(iSolicitudActual);
                                 itmDocumento["Estado"] = "Completado";
@@ -228,9 +248,115 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
 
 
             }
+            else {
+                if (sEstado == "Cerrado")
+                {
+
+                    SPQuery queryDA = new SPQuery();
+                    queryDA.Query = string.Concat("<Where><And><Eq><FieldRef Name='Solicitud_x0020_asociada' LookupId='TRUE'/>", "<Value Type='Lookup'>", iSolicitudActual, "</Value></Eq><Eq><FieldRef Name='Estado'/><Value Type='Text'>Pendiente</Value></Eq></And></Where>");
+                    SPListItemCollection itemColl = null;
+                    itemColl = lBitacora.GetItems(queryDA);
+
+                    foreach (SPListItem itmTarea in itemColl)
+                    {
+                        if (itmTarea["Estado"].ToString() == "Pendiente")
+                        {
+                            itmTarea["Estado"] = "Completado";
+                            itmTarea["Procesado"] = "SI";
+                            itmTarea["Fecha de Fin"] = DateTime.Now;
+                            itmTarea.Update();
+
+                        }
+                    }
+
+                    SPList lDocumentos = properties.Web.Lists["Solicitudes"];
+                    SPListItem itmDocumento = lDocumentos.GetItemById(iSolicitudActual);
+
+
+                    string fieldValue = "";
+                    fieldValue = itmDocumento["Author"].ToString();
+                    SPFieldUserValueCollection users = new SPFieldUserValueCollection(properties.ListItem.Web, fieldValue);
+                    string strResponsable = "";
+                    foreach (SPFieldUserValue uv in users)
+                    {
+                        if (uv.User != null)
+                        {
+                            SPUser user = uv.User;
+                            strResponsable = strResponsable + user.Email.ToString() + ";";
+                        }
+                        else
+                        {
+                            SPGroup sGroup = properties.Web.Groups[uv.LookupValue];
+                            foreach (SPUser user in sGroup.Users)
+                            {
+                                if (user.IsDomainGroup == true)
+                                {
+                                    ArrayList ADMembers = GetADGroupUsers(user.Name.ToString());
+                                    foreach (string userName in ADMembers)
+                                    {
+                                        strResponsable = strResponsable + userName + ";";
+                                    }
+                                }
+                                else
+                                {
+
+                                    strResponsable = strResponsable + user.Email.ToString() + ";";
+                                }
+                            }
+
+
+                        }
+
+                        // Process user
+                    }
+
+                    // Envío el correo
+                    StringBuilder strCuerpoAnuncio = new StringBuilder();
+                    String strCabeceraMail = "";
+                    strCuerpoAnuncio = strCuerpoAnuncio.Append("</tr>");
+
+                    string strDocumentoAsociado, strIdDocumentoAsociado;
+                    strDocumentoAsociado = itmDocumento.Title;
+                    strIdDocumentoAsociado = itmDocumento.ID.ToString();
+                    string strLinkPaginaTarea = properties.WebUrl + "/_layouts/15/SolicitudesDiseno/AprobacionSolicitud.aspx?ID=" + strIdDocumentoAsociado + "&Origen=T";
+                    strCabeceraMail = "La solicitud " + strDocumentoAsociado + " fue cerrada en la tarea " + properties.ListItem.Title.ToString() + ".";
+                    strCuerpoAnuncio = strCuerpoAnuncio.Append("<b>Comentarios del Cierre:</b> " + properties.ListItem["Comentarios"].ToString() + "<br />");
+                    strCuerpoAnuncio = strCuerpoAnuncio.Append("Información del proceso: " + @"<a href='" + strLinkPaginaTarea + "'>" + strDocumentoAsociado + "</a><br/>");
+
+                    string emailBody = " ";
+                    emailBody = emailBody + "</tr></table>";
+                    StringDictionary headers = new StringDictionary();
+                    headers.Add("to", strResponsable);// sDevolverMailUsuario(strResponsable, properties));
+                    headers.Add("from", properties.Web.Title.ToString() + "<sharepoint@baliarda.com.ar>");
+                    headers.Add("subject", "Solicitud Cerrada - " + strDocumentoAsociado);
+                    headers.Add("content-type", "text/html");
+                    SPUtility.SendEmail(properties.Web, headers, strCabeceraMail + "<br /><br />" + strCuerpoAnuncio.ToString() + emailBody);
+                    emailBody = "";
+                }
+            }
             
 
             return true;
+        }
+
+        public static void ActualizarMaterialesAjustes(Int32 iSolicitudActual, SPItemEventProperties properties)
+        {
+
+            SPQuery qryMateriales = new SPQuery();
+            SPList lProductosMateriales = properties.Web.Lists["Solicitud - Producto Material"];
+            String strQuery = "";
+            strQuery = "<Where><Eq><FieldRef Name='Solicitud' LookupId='TRUE' /><Value Type='Lookup'>" + iSolicitudActual.ToString() + "</Value></Eq></Where>";
+            qryMateriales.Query = strQuery;
+            SPListItemCollection lstProductosMateriales = lProductosMateriales.GetItems(qryMateriales);
+
+            foreach (SPListItem itmProductoMaterial in lstProductosMateriales)
+            {
+                itmProductoMaterial["Requiere Ajustes"] = 0;
+
+                itmProductoMaterial.Update();
+
+            }
+
         }
 
         public Int32 iTarea(Int32 iConfiguracionProceso, Int32 iDocumento, SPItemEventProperties properties)
@@ -452,6 +578,10 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
 
                 }
 
+                // Actualizo sector actual
+                SPListItem itmDocumentoAlta = lSolicitud.GetItemById(Convert.ToInt32(strIdSolicitudAsociada));
+                itmDocumentoAlta["Sector actual"] = strSectorPendiente(Convert.ToInt32(strIdSolicitudAsociada), properties);
+                itmDocumentoAlta.Update();
 
             }
         }
@@ -583,7 +713,7 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
         private ArrayList GetADGroupUsers(string groupName)
         {
             ArrayList userNames = new ArrayList();
-            PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
+            PrincipalContext ctx = new PrincipalContext(ContextType.Domain, "Baliarda.com", "sharepointservice", "Shrp8451");
             GroupPrincipal group = GroupPrincipal.FindByIdentity(ctx, groupName.Replace("Baliarda\\", "").ToString());
 
             if (group != null)
@@ -625,6 +755,14 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
         private String strSectorPendiente(Int32 idSolicitud, SPItemEventProperties properties) {
             String strAuxSector = "";
 
+            Boolean bPackaging = false;
+            Boolean bRegistro = false;
+            Boolean bDesarrollo = false;
+            Boolean bPlanificacion = false;
+            Boolean bRegistroInternacional = false;
+
+
+
             SPList lBitacora = properties.Web.Lists["Bitácora Solicitudes"];
             SPQuery queryDA = new SPQuery();
             queryDA.Query = string.Concat("<Where><Eq><FieldRef Name='Solicitud_x0020_asociada' LookupId='TRUE'/>", "<Value Type='Lookup'>", idSolicitud, "</Value></Eq></Where><OrderBy>  <FieldRef Name='ID' Ascending='False'/></OrderBy>");
@@ -634,30 +772,41 @@ namespace SolicitudesDiseno_Solicitudes.TareasSolicitudes
             {
                 if (itmTarea["Estado"].ToString() == "Pendiente") {
                     if (itmTarea["Sector"] != null) {
-                        if (strAuxSector != "")
-                        {
-                            if (strAuxSector != "Packaging") {
-                                if (strAuxSector != "Registro") { 
-                            strAuxSector = strAuxSector + "; " + itmTarea["Sector"].ToString();
-                                } else
-                                {
-                                    strAuxSector = "Registro";
-                                }
-                            } else {
-                                strAuxSector = "Packaging";
+                            if (itmTarea["Sector"].ToString() == "Packaging")
+                            {
+                                bPackaging = true;
                             }
-
-                        }
-                        else {
-                            strAuxSector = itmTarea["Sector"].ToString();
-                        }
+                            if (itmTarea["Sector"].ToString() == "Registro")
+                            {
+                                bRegistro  = true;
+                            }
+                            if (itmTarea["Sector"].ToString() == "Registro Internacional")
+                            {
+                                bRegistroInternacional = true;
+                            }
+                            if (itmTarea["Sector"].ToString() == "Desarrollo")
+                            {
+                                bDesarrollo = true;
+                            }
+                            if (itmTarea["Sector"].ToString() == "Planificación")
+                            {
+                                bPlanificacion = true;
+                            }
+                        
 
                     }
 
                 }
             }
 
-                return strAuxSector;
+            if (bRegistro == true) { strAuxSector = "Registro"; }
+            if (bRegistroInternacional == true) { strAuxSector = "Registro Internacional"; }
+            if (bDesarrollo == true) { if (strAuxSector == "") { strAuxSector = "Desarrollo"; } else { strAuxSector = strAuxSector + "; Desarrollo"; }  }
+            if (bPlanificacion == true) { if (strAuxSector == "") { strAuxSector = "Planificación"; } else { strAuxSector = strAuxSector + "; Planificación"; } }
+            if (bPackaging == true) { if (strAuxSector == "") { strAuxSector = "Packaging"; } else { strAuxSector = strAuxSector + "; Packaging"; } }
+
+
+            return strAuxSector;
 
         }
 

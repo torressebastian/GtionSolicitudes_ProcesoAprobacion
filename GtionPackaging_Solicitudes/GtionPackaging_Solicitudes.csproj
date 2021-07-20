@@ -59,6 +59,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Funciones_Comunes.cs" />
+    <Compile Include="Layouts\SolicitudesDiseno\CerrarCaso.aspx.cs">
+      <DependentUpon>CerrarCaso.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\SolicitudesDiseno\CerrarCaso.aspx.designer.cs">
+      <DependentUpon>CerrarCaso.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\SolicitudesDiseno\AprobacionSolicitud.aspx.cs">
       <DependentUpon>AprobacionSolicitud.aspx</DependentUpon>
     </Compile>
@@ -153,6 +160,7 @@
     <Content Include="Features\GtionPackaging_Solicitudes\GtionPackaging_Solicitudes.Template.xml">
       <DependentUpon>GtionPackaging_Solicitudes.feature</DependentUpon>
     </Content>
+    <Content Include="Layouts\SolicitudesDiseno\CerrarCaso.aspx" />
     <Content Include="Layouts\SolicitudesDiseno\AprobacionSolicitud.aspx" />
     <Content Include="Layouts\SolicitudesDiseno\AsignarTareaSolicitud.aspx" />
     <Content Include="Layouts\SolicitudesDiseno\CancelarProceso.aspx" />

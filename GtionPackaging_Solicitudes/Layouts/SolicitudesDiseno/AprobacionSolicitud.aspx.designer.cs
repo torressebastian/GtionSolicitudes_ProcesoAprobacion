@@ -391,6 +391,24 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno {
         protected global::Microsoft.SharePoint.WebControls.InputFormTextBox txtFechaFin;
         
         /// <summary>
+        /// tblMensajeReprocesar control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Table tblMensajeReprocesar;
+        
+        /// <summary>
+        /// txtMensaje control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.SharePoint.WebControls.InputFormTextBox txtMensaje;
+        
+        /// <summary>
         /// tblDatosAprobacionTareaActual control.
         /// </summary>
         /// <remarks>
@@ -490,6 +508,15 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno {
         protected global::System.Web.UI.WebControls.Button btnAprobar;
         
         /// <summary>
+        /// btnRechazar control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnRechazar;
+        
+        /// <summary>
         /// btnCambiarCorrector control.
         /// </summary>
         /// <remarks>
@@ -587,6 +614,15 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField ValidaMateriales;
+        
+        /// <summary>
+        /// TareaReinicio control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField TareaReinicio;
         
         /// <summary>
         /// Sector control.

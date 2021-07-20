@@ -191,7 +191,7 @@
                 <asp:boundfield datafield="C_x00f3_digo_x0020_de_x0020_Espe" headertext="Código Especificación"  />
                 <asp:boundfield datafield="C_x00f3_digo_x0020_de_x0020_Meto" headertext="Código Metodología Analítica"  />
                 <asp:boundfield datafield="Datos_x0020_de_x0020_Cobertura" headertext="Datos de Cobertura"  />
-
+                <asp:boundfield datafield="Requiere_x0020_Ajustes" headertext="-" Visible="true" ItemStyle-ForeColor="White"><ItemStyle Width="1px" Font-Size="XX-Small" HorizontalAlign="Left" /></asp:boundfield>
             </columns>
         </asp:gridview> 
         <asp:Table ID="Table1" runat="server" Width="100%" CssClass="ms-bottompaging">

@@ -97,6 +97,14 @@ namespace SolicitudesDiseno_Solicitudes.WP_BotoneraSolicitud {
         
         [GeneratedCodeAttribute("Microsoft.VisualStudio.SharePoint.ProjectExtensions.CodeGenerators.SharePointWebP" +
             "artCodeGenerator", "15.0.0.0")]
+        protected global::System.Web.UI.WebControls.Button btnDiscontinuos;
+        
+        [GeneratedCodeAttribute("Microsoft.VisualStudio.SharePoint.ProjectExtensions.CodeGenerators.SharePointWebP" +
+            "artCodeGenerator", "15.0.0.0")]
+        protected global::System.Web.UI.WebControls.TableCell cellDiscontinuos;
+        
+        [GeneratedCodeAttribute("Microsoft.VisualStudio.SharePoint.ProjectExtensions.CodeGenerators.SharePointWebP" +
+            "artCodeGenerator", "15.0.0.0")]
         protected global::System.Web.UI.WebControls.Table tblBar;
         
         [GeneratedCodeAttribute("Microsoft.VisualStudio.SharePoint.ProjectExtensions.CodeGenerators.SharePointWebPartCodeGenerator", "15.0.0.0")]
@@ -339,6 +347,39 @@ namespace SolicitudesDiseno_Solicitudes.WP_BotoneraSolicitud {
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         [GeneratedCodeAttribute("Microsoft.VisualStudio.SharePoint.ProjectExtensions.CodeGenerators.SharePointWebP" +
             "artCodeGenerator", "15.0.0.0")]
+        private global::System.Web.UI.WebControls.Button @__BuildControlbtnDiscontinuos() {
+            global::System.Web.UI.WebControls.Button @__ctrl;
+            @__ctrl = new global::System.Web.UI.WebControls.Button();
+            this.btnDiscontinuos = @__ctrl;
+            @__ctrl.ApplyStyleSheetSkin(this.Page);
+            @__ctrl.ID = "btnDiscontinuos";
+            @__ctrl.Text = "Discontinuos";
+            @__ctrl.Click -= new System.EventHandler(this.btnDiscontinuos_Click);
+            @__ctrl.Click += new System.EventHandler(this.btnDiscontinuos_Click);
+            return @__ctrl;
+        }
+        
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [GeneratedCodeAttribute("Microsoft.VisualStudio.SharePoint.ProjectExtensions.CodeGenerators.SharePointWebP" +
+            "artCodeGenerator", "15.0.0.0")]
+        private global::System.Web.UI.WebControls.TableCell @__BuildControlcellDiscontinuos() {
+            global::System.Web.UI.WebControls.TableCell @__ctrl;
+            @__ctrl = new global::System.Web.UI.WebControls.TableCell();
+            this.cellDiscontinuos = @__ctrl;
+            @__ctrl.ApplyStyleSheetSkin(this.Page);
+            @__ctrl.ID = "cellDiscontinuos";
+            @__ctrl.HorizontalAlign = global::System.Web.UI.WebControls.HorizontalAlign.Center;
+            @__ctrl.Width = new System.Web.UI.WebControls.Unit(100D, global::System.Web.UI.WebControls.UnitType.Pixel);
+            global::System.Web.UI.WebControls.Button @__ctrl1;
+            @__ctrl1 = this.@__BuildControlbtnDiscontinuos();
+            System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
+            @__parser.AddParsedSubObject(@__ctrl1);
+            return @__ctrl;
+        }
+        
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        [GeneratedCodeAttribute("Microsoft.VisualStudio.SharePoint.ProjectExtensions.CodeGenerators.SharePointWebP" +
+            "artCodeGenerator", "15.0.0.0")]
         private void @__BuildControl__control4(System.Web.UI.WebControls.TableCellCollection @__ctrl) {
             global::System.Web.UI.WebControls.TableCell @__ctrl1;
             @__ctrl1 = this.@__BuildControlcellLanzInternacional();
@@ -361,6 +402,9 @@ namespace SolicitudesDiseno_Solicitudes.WP_BotoneraSolicitud {
             global::System.Web.UI.WebControls.TableCell @__ctrl7;
             @__ctrl7 = this.@__BuildControlcellInternacional();
             @__ctrl.Add(@__ctrl7);
+            global::System.Web.UI.WebControls.TableCell @__ctrl8;
+            @__ctrl8 = this.@__BuildControlcellDiscontinuos();
+            @__ctrl.Add(@__ctrl8);
         }
         
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]

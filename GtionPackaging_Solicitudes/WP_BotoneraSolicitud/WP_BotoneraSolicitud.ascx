@@ -29,5 +29,8 @@
         <asp:TableCell ID="cellInternacional" HorizontalAlign="Center" Width="100px">
             <asp:Button ID="btnInternacional" runat="server" Text="Modificación de Archivos (Internacional)" OnClick="btnModInternacional_Click" />
         </asp:TableCell>
+        <asp:TableCell ID="cellDiscontinuos" HorizontalAlign="Center" Width="100px">
+            <asp:Button ID="btnDiscontinuos" runat="server" Text="Discontinuos" OnClick="btnDiscontinuos_Click" />
+        </asp:TableCell>
     </asp:TableRow>
 </asp:Table>

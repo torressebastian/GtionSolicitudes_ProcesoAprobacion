@@ -36,9 +36,9 @@
     <h2 runat="server" style="background-color:cadetblue;color:white" Font-Bold="true">&nbsp;&nbsp;Acción a Realizar</h2>
     <asp:RadioButtonList ID="rblAccion" runat="server" OnSelectedIndexChanged="rblAccion_SelectedIndexChanged" AutoPostBack="true" >
         <asp:ListItem Selected="False" Value="0" Text="Reiniciar Solicitud"></asp:ListItem>
-        <asp:ListItem Selected="False" Value="1" Text="Solicitar Datos Adicionales"></asp:ListItem>
-        <asp:ListItem Selected="False" Value="2" Text="Solicitar Ajustes de Materiales Nuevo o Reemplazantes"></asp:ListItem>
-        
+        <asp:ListItem Selected="False" Value="1" Text="Solicitar Productos o Materiales Adicionales"></asp:ListItem>
+        <asp:ListItem Selected="False" Value="2" Text="Solicitar Ajustes de Materiales Nuevos o Reemplazantes"></asp:ListItem>
+        <asp:ListItem Selected="False" Value="3" Text="Solicitar Archivos de Arte"></asp:ListItem>
     </asp:RadioButtonList>
 
     <asp:CheckBoxList ID="cblSeleccionMaterial" Visible="false" runat="server" ></asp:CheckBoxList><br />

@@ -238,6 +238,87 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno {
         protected global::System.Web.UI.WebControls.TableRow tbrDatoCobertura;
         
         /// <summary>
+        /// cellRecursosUtilizados control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TableCell cellRecursosUtilizados;
+        
+        /// <summary>
+        /// lblRecursosUtilizados control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblRecursosUtilizados;
+        
+        /// <summary>
+        /// txtRecursosUtilizados control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtRecursosUtilizados;
+        
+        /// <summary>
+        /// cellCantidadBlister control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TableCell cellCantidadBlister;
+        
+        /// <summary>
+        /// lblCantidadBlister control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblCantidadBlister;
+        
+        /// <summary>
+        /// txtCantidadBlister control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtCantidadBlister;
+        
+        /// <summary>
+        /// cellCriterioUnificacion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TableCell cellCriterioUnificacion;
+        
+        /// <summary>
+        /// lblCriterioUnificacion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblCriterioUnificacion;
+        
+        /// <summary>
+        /// txtCriterioUnificacion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtCriterioUnificacion;
+        
+        /// <summary>
         /// lblDatosCobertura control.
         /// </summary>
         /// <remarks>

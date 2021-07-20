@@ -233,6 +233,15 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                     // La sección Materiales está dispobible en todo momento. 
                     btnInformacionMateriales.Visible = true;
 
+
+                    // Si el tipo de solicitud es Discontinuos, no se cargan materiales hasta una vez iniciados
+                    if (sTipoSolicitud == "Discontinuos" && sEstado == "No Iniciada")
+                    {
+                        btnInformacionMateriales.Enabled = false;
+                    }
+
+
+
                     if (sTipo != "Lanzamiento" && sEstado == "Pendiente Inicio Packaging")
                     {
                         if (Funciones_Comunes.UsuarioGrupo(currentUser, Funciones_Comunes.iDevolverIdSector("Packaging")) == true)
@@ -421,6 +430,7 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                         }
                         else {
                             tblDatosTareaActual.Visible = false;
+                            tblMensajeReprocesar.Visible = false;
                             tblDatosAprobacionTareaActual.Visible = false;
                             tblAdjuntarDocumento.Visible = false;
                             tblDatosAprobacion.Visible = false;
@@ -475,6 +485,12 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                     if (itmTarea["Fecha de Inicio"] is null) { txtFechaInicio.Text = ""; } else { txtFechaInicio.Text = Convert.ToDateTime(itmTarea["Fecha de Inicio"].ToString()).ToShortDateString(); };
                     if (itmTarea["Fecha de Fin"] is null) { txtFechaFin.Text = ""; }
                     if (itmTarea["Comentarios"] is null) { txtDatosAprobacion.Text = ""; } else { txtDatosAprobacion.Text = itmTarea["Comentarios"].ToString(); };
+                    if (itmTarea["Mensaje"] is null) { txtMensaje.Text = ""; } else { txtMensaje.Text = itmTarea["Mensaje"].ToString(); };
+
+                    if (txtMensaje.Text != "")
+                    {
+                        tblMensajeReprocesar.Visible = true;
+                    }
 
                     if (itmTarea["Asignado"] is null) { strCorrector = ""; }
                     else
@@ -560,6 +576,43 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                             else
                             {
                                 ValidaMateriales.Value = "SI";
+                            }
+                        }
+
+                        if (itmConfiguracionProceso["Tarea Reinicio"] is null)
+                        {
+                            TareaReinicio.Value = "NO";
+                        }
+                        else
+                        {
+
+                            if (itmConfiguracionProceso["Tarea Reinicio"].ToString() == "False")
+                            {
+                                TareaReinicio.Value = "NO";
+                            }
+                            else
+                            {
+                                TareaReinicio.Value = "SI";
+                            }
+                        }
+
+                        if (itmConfiguracionProceso["Cierre Caso"] is null)
+                        {
+                            btnRechazar.Visible = false;
+                            btnRechazar.Enabled = false;
+                        }
+                        else
+                        {
+
+                            if (itmConfiguracionProceso["Cierre Caso"].ToString() == "NO")
+                            {
+                                btnRechazar.Visible = false;
+                                btnRechazar.Enabled = false;
+                            }
+                            else
+                            {
+                                btnRechazar.Visible = true;
+                                btnRechazar.Enabled = true;
                             }
                         }
 
@@ -868,13 +921,35 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
         }
         protected void btnIniciarProceso_Click(object sender, EventArgs e)
         {
-            Int32 idSolicitud = Convert.ToInt32(Request["ID"]);
-            if (bGuardarCambios() == true) { 
-            Int32 iValidarProducto = bValidarProductos(false, false);
+            btnIniciarProceso.Enabled = false;
+            btnIniciarProceso.Text = "Procesando";
+            if (vIniciarProceso() == true)
+            {
+                System.Threading.Thread.Sleep(10000);
 
-            if (txtTipoDocumento.Text == "Modificación de Archivos (Desarrollo)"){
-                iValidarProducto = bValidarProductos(true, true); 
+                Response.Redirect(SPContext.Current.Site.Url + "/SolicitudesDiseno/_layouts/15/SolicitudesDiseno/AprobacionSolicitud.aspx?ID=" + Request["ID"]);
             }
+            btnIniciarProceso.Text = "Iniciar Proceso";
+            btnIniciarProceso.Enabled = true;
+        }
+
+        protected Boolean vIniciarProceso()
+        {
+            Int32 idSolicitud = Convert.ToInt32(Request["ID"]);
+            if (bGuardarCambios() == true)
+            {
+                Int32 iValidarProducto = bValidarProductos(false, false);
+
+                if (txtTipoDocumento.Text == "Modificación de Archivos (Desarrollo)")
+                {
+                    iValidarProducto = bValidarProductos(true, true);
+                }
+
+                if (txtTipoDocumento.Text == "Discontinuos")
+                {
+                    iValidarProducto = 1; // Si es Discontinuos, no valido que se hayan cargado productos o materiales
+                }
+
                 if (iValidarProducto == 1)
                 {
                     using (SPSite site = new SPSite(SPContext.Current.Site.Url))
@@ -887,6 +962,15 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                             String strSectorActual = "";
 
                             SPListItem itmSolicitud = lSolicitudes.GetItemById(idSolicitud);
+                            itmSolicitud["Fecha Inicio Solicitud"] = DateTime.Now;
+                            SPUser oUser = SPContext.Current.Web.CurrentUser;
+                            itmSolicitud["Administrador"] = oUser;
+                            itmSolicitud["Sector actual"] = strSectorActual;
+                            itmSolicitud["Inicio Proceso"] = "NO";
+                            itmSolicitud["Estado"] = "En Curso";
+                            itmSolicitud.Update();
+
+                            itmSolicitud = lSolicitudes.GetItemById(idSolicitud);
 
                             SPQuery query = new SPQuery();
                             query.Query = "<Where><Eq><FieldRef Name=\"Title\" /><Value Type=\"Text\">Inicio Proceso Solicitud</Value></Eq></Where>";
@@ -947,17 +1031,9 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                             }
 
 
-                            itmSolicitud["Fecha Inicio Solicitud"] = DateTime.Now;
-                            SPUser oUser = SPContext.Current.Web.CurrentUser;
-                            itmSolicitud["Administrador"] = oUser;
-                            itmSolicitud["Sector actual"] = strSectorActual;
-                            itmSolicitud["Inicio Proceso"] = "NO";
-                            itmSolicitud["Estado"] = "En Curso";
-                            itmSolicitud.Update();
+                            
 
-                            System.Threading.Thread.Sleep(10000);
-
-                            Response.Redirect(SPContext.Current.Site.Url + "/SolicitudesDiseno/_layouts/15/SolicitudesDiseno/AprobacionSolicitud.aspx?ID=" + Request["ID"]);
+                            return true;
 
                             //CargarTareaActual(idDocument);
                             //CargarTareasCumplidas(idDocument);
@@ -995,10 +1071,12 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                         lblMensajeError.Visible = true;
                     }
 
+                    return false;
 
                 }
-            }
+            }else { return false; }
         }
+
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
             Boolean bProcesar = true;
@@ -1061,7 +1139,7 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
 
                 if (iResultadoValidar == 3)
                 {
-                    lblMensajeError.Text = "Los datos de productos asociados a la tarea no están completos. Verifique los datos de Productos.";
+                    lblMensajeError.Text = "Los datos de productos o materiales reemplazados asociados a la tarea no están completos. Verifique los datos de Productos o Materiales Reemplazados.";
                     lblMensajeError.Visible = true;
                     bProcesar = false;
                 }
@@ -1077,6 +1155,12 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                 }
             }
 
+            if (TareaReinicio.Value == "SI")
+            {
+                bProcesar = vIniciarProceso();
+            }
+
+
             // Valido la existencia de materiales para cada producto.
 
 
@@ -1087,34 +1171,45 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                 {
                     using (SPWeb web = site.OpenWeb("SolicitudesDiseno"))
                     {
+
+
+
                         SPList lBitacora = web.Lists["Bitácora Solicitudes"];
                         SPListItem itmBitacora = lBitacora.GetItemById(Convert.ToInt32(IdTareaBitacora.Value.ToString()));
                         //itmBitacora["Comentario de Revisión / Aprobación"] = txtDatosAprobacion.Text.ToString();
                         itmBitacora["Comentarios"] = txtDatosAprobacion.Text.ToString();
                         itmBitacora["Asignado"] = SPContext.Current.Web.CurrentUser;
                         itmBitacora["Estado"] = "Completado";
+                        if (TareaReinicio.Value == "SI")
+                        {
+                            itmBitacora["Procesado"] = "SI";
+                        }
                         itmBitacora.Update();
 
                         String sTipo = Funciones_Comunes.DevolverTipoSolicitud(txtTipoDocumento.Text.ToString());
 
-                        if (sTipo == "Modificación") {
-                            // Valido el tipo de tarea que corresponda
-                            if (strNombreSector.Value == "Desarrollo") {
-                                txtComentarioDesarrollo.Text = txtDatosAprobacion.Text.ToString();
-                            }
-                            if (strNombreSector.Value == "Planificación") {
-                                txtComentarioPlanificacion.Text = txtDatosAprobacion.Text.ToString();
-                            }
+                        if (TareaReinicio.Value == "NO")
+                        {
+                        
+                        
+                            if (sTipo == "Modificación") {
+                                // Valido el tipo de tarea que corresponda
+                                if (strNombreSector.Value == "Desarrollo") {
+                                    txtComentarioDesarrollo.Text = txtDatosAprobacion.Text.ToString();
+                                }
+                                if (strNombreSector.Value == "Planificación") {
+                                    txtComentarioPlanificacion.Text = txtDatosAprobacion.Text.ToString();
+                                }
 
-                            SPList lstList = SPContext.Current.Web.Lists["Solicitudes"];
-                            SPListItem itmAdjunto;
-                            itmAdjunto = lstList.GetItemById(Convert.ToInt32(Request["ID"]));
-                            itmAdjunto["Comentario desarrollo"] = txtComentarioDesarrollo.Text.ToString();
-                            itmAdjunto["Comentario planificacion"] = txtComentarioPlanificacion.Text.ToString();
-                            itmAdjunto.Update();
+                                SPList lstList = SPContext.Current.Web.Lists["Solicitudes"];
+                                SPListItem itmAdjunto;
+                                itmAdjunto = lstList.GetItemById(Convert.ToInt32(Request["ID"]));
+                                itmAdjunto["Comentario desarrollo"] = txtComentarioDesarrollo.Text.ToString();
+                                itmAdjunto["Comentario planificacion"] = txtComentarioPlanificacion.Text.ToString();
+                                itmAdjunto.Update();
 
+                            }
                         }
-
                     }
 
                 }
@@ -1126,41 +1221,11 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
         }
         protected void btnRechazar_Click(object sender, EventArgs e)
         {
-            if (txtDatosAprobacion.Text.ToString() != "")
-            {
-                Int32 idDocument = Convert.ToInt32(Request["ID"]);
-                using (SPSite site = new SPSite(SPContext.Current.Site.Url))
-                {
-                    using (SPWeb web = site.OpenWeb("SolicitudesDiseno"))
-                    {
-                        SPList lBitacora = web.Lists["Bitácora Solicitudes"];
-                        SPListItem itmBitacora = lBitacora.GetItemById(Convert.ToInt32(IdTareaBitacora.Value.ToString()));
-                        itmBitacora["Asignado"] = SPContext.Current.Web.CurrentUser;
-                        itmBitacora["Estado"] = "Rechazado";
-                        itmBitacora.Update();
 
-                        SPList lDocumentos = web.Lists["Solicitudes"];
-                        SPListItem itmDocumento = lDocumentos.GetItemById(idDocument);
+            Response.Redirect(SPContext.Current.Site.Url + "/SolicitudesDiseno/_layouts/15/SolicitudesDiseno/CerrarCaso.aspx?ID=" + Request["ID"] + "&Tarea=" + IdTareaBitacora.Value.ToString());
 
-                        itmDocumento["Inicio Proceso"] = "SI";
-                        itmDocumento["Estado"] = "Rechazado";
-                        itmDocumento["Usuario Asignado"] = null;
-                        itmDocumento["Fecha Vencimiento"] = null;
-                        itmDocumento.Update();
 
-                        Response.Redirect(SPContext.Current.Site.Url + "/SolicitudesDiseno/_layouts/15/SolicitudesDiseno/ProcesandoSolicitud.aspx?ID=" + Request["ID"]);
-                    }
-
-                }
-                CargarTareaEdicion(Convert.ToInt32(IdTareaBitacora.Value.ToString()));
-                CargarTareasCumplidas(idDocument);
-            }
-            else
-            {
-                lblMensajeError.Text = "Se debe indicar el motivo del rechazo de la tarea.";
-                lblMensajeError.Visible = true;
-                txtDatosAprobacion.Focus();
-            }
+            
 
 
 
@@ -1498,8 +1563,8 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
         private ArrayList GetADGroupUsers(string groupName)
         {
             ArrayList userNames = new ArrayList();
-            PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
-            GroupPrincipal group = GroupPrincipal.FindByIdentity(ctx, groupName.Replace("Baliarda\\", "").ToString());
+            PrincipalContext ctx = new PrincipalContext(ContextType.Domain, "Baliarda.com", "sharepointservice", "Shrp8451");
+            GroupPrincipal group = GroupPrincipal.FindByIdentity(ctx, groupName.Replace("BALIARDA\\", "").ToString());
 
             if (group != null)
             {
@@ -1584,7 +1649,7 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
         }
 
         protected Int32 bValidarProductos(Boolean bValidarObligatorio, Boolean bValidarMaterial) {
-            Int32 bAuxResultado = 0;
+            Int32 bAuxResultado = 3;
 
             Int32 idDocument = 0;
             idDocument = Convert.ToInt32(Request["ID"]);

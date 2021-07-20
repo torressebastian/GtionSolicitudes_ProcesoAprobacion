@@ -97,18 +97,18 @@ namespace GtionPackaging_Solicitudes.Layouts.SolicitudesDiseno
                             ddlSeleccioneTarea.Items.Add(itmTarea0);
                             itmTarea0 = new ListItem();
                             itmTarea0.Value = "S";
-                            itmTarea0.Text = "Inicio Solicitud";
+                            itmTarea0.Text = "Solicitar Nuevo Producto o Material a Reemplazar";
                             ddlSeleccioneTarea.Items.Add(itmTarea0);
                             int i = 0;
                             foreach (SPListItem itmTarea in itemColl)
                             {
                                 if (itmTarea["Sector"] != null)
                                 {
-                                    if (itmTarea["Sector"].ToString().Split('#')[1] != "Packaging")
+                                    if (itmTarea["Sector"].ToString().Split('#')[1] == "Desarrollo")
                                     {
                                         ListItem itmTareaActiva = new ListItem();
                                         itmTareaActiva.Value = itmTarea.ID.ToString();
-                                        itmTareaActiva.Text = itmTarea.Title.ToString();
+                                        itmTareaActiva.Text = itmTarea["Título Reinicio"].ToString();
                                         ddlSeleccioneTarea.Items.Add(itmTareaActiva);
                                         i = i + 1;
                                     }
@@ -118,6 +118,11 @@ namespace GtionPackaging_Solicitudes.Layouts.SolicitudesDiseno
                             if (bRechazarSolictud ==false)
                             {
                                 rblAccion.Items[0].Enabled = false;
+                            }
+
+                            if (sTipoSolicitud != "Lanzamiento Nacional" && sTipoSolicitud != "Lanzamiento Internacional")
+                            {
+                                rblAccion.Items[3].Enabled = false;
                             }
                         }
                     }
@@ -145,7 +150,7 @@ namespace GtionPackaging_Solicitudes.Layouts.SolicitudesDiseno
 
             if (bContinuar == true)
             {
-                if (rblAccion.SelectedValue == "1" || rblAccion.SelectedValue == "2")
+                if (rblAccion.SelectedValue == "1" )
                 {
                     if (ddlSeleccioneTarea.SelectedIndex == 0)
                     {
@@ -217,10 +222,12 @@ namespace GtionPackaging_Solicitudes.Layouts.SolicitudesDiseno
                                     vGenerarTarea();
 
                                     // Actualizo el estado de la solicitud y habilito el inicio
-                                    
+
                                     itmDocumento["Estado"] = "Reinicio Pendiente";
-                                    itmDocumento["Inicio Proceso"] = "SI";
+                                    //itmDocumento["Inicio Proceso"] = "SI";
+                                    itmDocumento["Requiere Ajustes"] = 1;
                                     itmDocumento.Update();
+                                    vGenerarTareaSiguiente("INICIO", "INICIO");
                                 }
                             }
                         });
@@ -257,16 +264,26 @@ namespace GtionPackaging_Solicitudes.Layouts.SolicitudesDiseno
                                 SPList lBitacora = web.Lists["Bitácora Solicitudes"];
                                 SPListItem itmDocumento = lDocumentos.GetItemById(idDocument);
 
-                                if (ddlSeleccioneTarea.SelectedValue != "S") { 
-                                    vGenerarTareaSiguiente(Convert.ToInt32(ddlSeleccioneTarea.SelectedValue.ToString()));
-                                    itmDocumento["Estado"] = "En Curso";
+                                if (ddlSeleccioneTarea.SelectedValue != "S")
+                                {
+                                    itmDocumento["Estado"] = "Ajustes En Curso";
+                                    itmDocumento["Requiere Ajustes"] = 1;
                                     itmDocumento.Update();
-                                } else
+                                    vGenerarTareaSiguiente("Desarrollo", "Desarrollo");
+
+                                }
+
+                                else
                                 {
                                     itmDocumento["Estado"] = "Reinicio Pendiente";
-                                    itmDocumento["Inicio Proceso"] = "SI";
+                                    //itmDocumento["Inicio Proceso"] = "SI";
+                                    itmDocumento["Requiere Ajustes"] = 1;
                                     itmDocumento.Update();
+                                    vGenerarTareaSiguiente("INICIO", "INICIO");
                                 }
+
+
+                                
 
                                 // Genero tarea de revisión
                                 vGenerarTarea();
@@ -309,26 +326,106 @@ namespace GtionPackaging_Solicitudes.Layouts.SolicitudesDiseno
                                 foreach (ListItem itemTarea in cblSeleccionMaterial.Items)
                                 {
                                     if (itemTarea.Selected == true) { 
+
                                         sbDelete.Append(string.Format(buildQuery, itemTarea.Value.ToString()));
+                                        vActualizarMaterialAjustes(itemTarea.Text.ToString());
                                     }
+
+
+
                                 }
                                 sbDelete.Append("</Batch>");
                                 web.ProcessBatchData(sbDelete.ToString());
                                 
-                                if (ddlSeleccioneTarea.SelectedValue != "S")
-                                {
-                                    vGenerarTareaSiguiente(Convert.ToInt32(ddlSeleccioneTarea.SelectedValue.ToString()));
-                                    itmDocumento["Estado"] = "En Curso";
-
+                                //if (ddlSeleccioneTarea.SelectedValue != "S")
+                                //{
+                                    itmDocumento["Estado"] = "Ajustes En Curso";
+                                    itmDocumento["Requiere Ajustes"] = 1;
                                     itmDocumento.Update();
-                                }
+                                    vGenerarTareaSiguiente("Desarrollo", "Desarrollo");
+                                    
+                                //}
 
-                                else
+                                //else
+                                //{
+                                //    itmDocumento["Estado"] = "Reinicio Pendiente";
+                                //    //itmDocumento["Inicio Proceso"] = "SI";
+                                //    itmDocumento["Requiere Ajustes"] = 1;
+                                //    itmDocumento.Update();
+                                //    vGenerarTareaSiguiente("INICIO", "INICIO");
+                                //}
+
+                                // Genero tarea de revisión
+                                vGenerarTarea();
+
+                            }
+                        }
+                    });
+
+                }
+
+                if (rblAccion.SelectedValue == "3")
+                {
+
+                    idDocument = Convert.ToInt32(Request["ID"]);
+
+                    // Obtengo el usuario con el que me conecto
+                    SPUser currentUser = SPContext.Current.Web.CurrentUser;
+                    Errores.Text = Errores.Text + currentUser.Name.ToString();
+
+                    Guid siteId = SPContext.Current.Site.ID;
+                    Guid webId = SPContext.Current.Web.ID;
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    {
+                        using (SPSite site = new SPSite(siteId))
+                        {
+                            using (SPWeb web = site.OpenWeb(webId))
+                            {
+                                web.AllowUnsafeUpdates = true;
+
+                                SPList lDocumentos = web.Lists["Solicitudes"];
+                                SPList lBitacora = web.Lists["Bitácora Solicitudes"];
+                                SPListItem itmDocumento = lDocumentos.GetItemById(idDocument);
+
+                                StringBuilder sbDelete = new StringBuilder();
+                                string xmlFormat = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+                                sbDelete.Append(xmlFormat);
+                                sbDelete.Append("<Batch>");
+                                string buildQuery = "<Method><SetList Scope=\"Request\">" + lBitacora.ID + "</SetList>";
+                                buildQuery = buildQuery +
+                                "<SetVar Name=\"ID\">{0}</SetVar><SetVar Name=\"Cmd\">Delete</SetVar></Method>";
+                                foreach (ListItem itemTarea in cblSeleccionMaterial.Items)
                                 {
-                                    itmDocumento["Estado"] = "Reinicio Pendiente";
-                                    itmDocumento["Inicio Proceso"] = "SI";
-                                    itmDocumento.Update();
+                                    if (itemTarea.Selected == true)
+                                    {
+
+                                        sbDelete.Append(string.Format(buildQuery, itemTarea.Value.ToString()));
+                                        vActualizarMaterialAjustes(itemTarea.Text.ToString());
+                                    }
+
+
+
                                 }
+                                sbDelete.Append("</Batch>");
+                                web.ProcessBatchData(sbDelete.ToString());
+
+                                //if (ddlSeleccioneTarea.SelectedValue != "S")
+                                //{
+                                    itmDocumento["Estado"] = "Ajustes En Curso";
+                                    itmDocumento["Requiere Ajustes"] = 1;
+                                    itmDocumento.Update();
+                                    vGenerarTareaSiguiente("Registro", "Registro Internacional");
+
+                                //}
+
+                                //else
+                                //{
+                                 //   itmDocumento["Estado"] = "Reinicio Pendiente";
+                                    //itmDocumento["Inicio Proceso"] = "SI";
+                                //    itmDocumento["Requiere Ajustes"] = 1;
+                                //    itmDocumento.Update();
+                                //    vGenerarTareaSiguiente(0);
+                                //}
 
                                 // Genero tarea de revisión
                                 vGenerarTarea();
@@ -382,16 +479,71 @@ namespace GtionPackaging_Solicitudes.Layouts.SolicitudesDiseno
                         // Genero una tarea para indicar que fue Reiniciado
                         SPList lConfiguracionProceso = web.Lists["Configuración Proceso Solicitudes"];
                         SPList lBitacora = web.Lists["Bitácora Solicitudes"];
+                        String strMensaje = "";
+                        String strTarea = "";
+
+                        if (rblAccion.SelectedValue == "1") { 
+                            if (ddlSeleccioneTarea.SelectedValue != "S")
+                            {
+                                Int32 idTarea = Convert.ToInt32(ddlSeleccioneTarea.SelectedValue.ToString());
+                                SPListItem itmConfiguracionProcesoSiguiente = lConfiguracionProceso.GetItemById(idTarea);
+
+                                strTarea = " Realizar Ajustes - " + itmConfiguracionProcesoSiguiente["Sector"].ToString().Split('#')[1].ToString();
+
+
+
+                            } else
+                            {
+                                strTarea = ddlSeleccioneTarea.SelectedItem.Text.ToString();
+                            }
+                        }
+                        strMensaje = txtMensaje.Text.ToString();
+
+                        if (rblAccion.SelectedValue == "0")
+                        {
+                            strMensaje = strMensaje + " - Tarea Destino: Reiniciar la solicitud.";
+                        }
+                        if (rblAccion.SelectedValue == "1")
+                        {
+                            strMensaje = strMensaje + " - Tarea Destino: Reiniciar la solicitud.";
+
+
+                        }
+                        if (rblAccion.SelectedValue == "2")
+                        {
+                            strMensaje = strMensaje + " - Materiales: ";
+                            foreach (ListItem itemTarea in cblSeleccionMaterial.Items)
+                            {
+                                if (itemTarea.Selected == true)
+                                {
+                                    strMensaje = strMensaje + itemTarea.Text.ToString() + "; ";
+                                }
+                            }
+                            strMensaje = strMensaje + " - Tarea Destino: Desarrollo";
+                        }
+
+                        if (rblAccion.SelectedValue == "3")
+                        {
+                            strMensaje = strMensaje + " - Materiales: ";
+                            foreach (ListItem itemTarea in cblSeleccionMaterial.Items)
+                            {
+                                if (itemTarea.Selected == true)
+                                {
+                                    strMensaje = strMensaje + itemTarea.Text.ToString() + "; ";
+                                }
+                            }
+                            strMensaje = strMensaje + " - Tarea Destino: Cargar Artes" ;
+                        }
 
                         SPQuery query = new SPQuery();
-                        query.Query = "<Where><Eq><FieldRef Name=\"Title\" /><Value Type=\"Text\">Requerir Ajustes en la Solicitud</Value></Eq></Where>";
+                        query.Query = "<Where><Eq><FieldRef Name=\"Title\" /><Value Type=\"Text\">Ajustes en la Solicitud</Value></Eq></Where>";
                         query.RowLimit = 1;
                         query.ViewFields = "";
                         SPListItemCollection items = lConfiguracionProceso.GetItems(query);
                         SPListItem item = items[0];
 
                         SPListItem itmTareaResumen = lBitacora.AddItem();
-                        itmTareaResumen["Title"] = "Requerir Ajustes en la Solicitud - " + rblAccion.SelectedItem.Text.ToString();
+                        itmTareaResumen["Title"] = "Ajustes en la Solicitud - " + rblAccion.SelectedItem.Text.ToString();
                         itmTareaResumen["Solicitud asociada"] = idDocument;
                         itmTareaResumen["Estado"] = "Completado";
                         itmTareaResumen["Procesado"] = "SI";
@@ -399,7 +551,7 @@ namespace GtionPackaging_Solicitudes.Layouts.SolicitudesDiseno
                         itmTareaResumen["Comentarios"] = txtMensaje.Text.ToString();
                         itmTareaResumen["Fecha de Fin"] = Funciones_Comunes.dtFechaVencimiento(Convert.ToInt32(item["Días Vencimiento"].ToString()));
                         itmTareaResumen["Asignado"] = SPContext.Current.Web.CurrentUser;
-                        itmTareaResumen["Mensaje"] = txtMensaje.Text.ToString();
+                        itmTareaResumen["Mensaje"] = strMensaje;
                         itmTareaResumen.Update();
                     }
                 }
@@ -407,10 +559,11 @@ namespace GtionPackaging_Solicitudes.Layouts.SolicitudesDiseno
 
         }
 
-        private void vGenerarTareaSiguiente(Int32 idTarea)
+        private void vGenerarTareaSiguiente(String strSectorNac, String strSectorInt)
         {
 
             idDocument = Convert.ToInt32(Request["ID"]);
+            Int32 idTarea = 0;
 
             // Obtengo el usuario con el que me conecto
             SPUser currentUser = SPContext.Current.Web.CurrentUser;
@@ -430,19 +583,120 @@ namespace GtionPackaging_Solicitudes.Layouts.SolicitudesDiseno
                         SPList lConfiguracionProceso = web.Lists["Configuración Proceso Solicitudes"];
                         SPList lBitacora = web.Lists["Bitácora Solicitudes"];
                         SPList lDocumentos = web.Lists["Solicitudes"];
+                        SPList lSectores = web.Lists["Sectores"];
 
                         SPListItem itmDocumento = lDocumentos.GetItemById(idDocument);
-
-                        SPListItem itmConfiguracionProcesoSiguiente = lConfiguracionProceso.GetItemById(idTarea);
-
-                        Int32 idSector = Convert.ToInt32(itmConfiguracionProcesoSiguiente["Sector"].ToString().Split(';')[0].ToString());
-                        SPList lSectores = web.Lists["Sectores"];
-                        SPListItem imSector = lSectores.GetItemById(idSector);
+                        sTipoSolicitud = itmDocumento.ContentType.Name.ToString();
 
 
-                            // Inicializo la tarea siguiente
+                        // Busco la tarea siguiente de acuerdo al sector
+                        if (strSectorNac != "INICIO"){ 
+                            SPQuery query = new SPQuery();
+                            SPQuery queryConfig = new SPQuery();
+                            queryConfig.Query = string.Concat("<Where><Contains><FieldRef Name='Circuito'/><Value Type='LookupMulti'>", txtTipoDocumento.Text, "</Value></Contains></Where>");
+                            SPListItemCollection itemColl = null;
+                            itemColl = lConfiguracionProceso.GetItems(queryConfig);
+
+                            foreach (SPListItem itmTarea in itemColl)
+                            {
+                                if (itmTarea["Sector"] != null)
+                                {
+                                    if (itmTarea["Sector"].ToString().Split('#')[1] == strSectorNac || itmTarea["Sector"].ToString().Split('#')[1] == strSectorInt)
+                                    {
+
+                                        if (strSectorNac == "Registro") // Si es Registro, busco la tarea arte
+                                        {
+                                            if (itmTarea["Adjunto Obligatorio"] is null)
+                                            {
+                                            
+                                            }
+                                            else
+                                            {
+
+                                                if (itmTarea["Adjunto Obligatorio"].ToString() == "True")
+                                                {
+                                                    idTarea = itmTarea.ID;
+                                                }
+                                                
+                                            }
+                                        } else
+                                        {
+                                            idTarea = itmTarea.ID;
+                                        }
+
+                                        
+                                    }
+                                }
+                            }
+                        }
+                        
+                        SPListItem itmConfiguracionProcesoSiguiente;
+                        SPListItem imSector;
+                        Int32 idSector;
+
+                        if (idTarea != 0) { 
+                            itmConfiguracionProcesoSiguiente = lConfiguracionProceso.GetItemById(idTarea);
+                        } else
+                        {
+                            SPQuery query = new SPQuery();
+                            query.Query = "<Where><Eq><FieldRef Name=\"Title\" /><Value Type=\"Text\">Reiniciar Solicitud</Value></Eq></Where>";
+                            query.RowLimit = 1;
+                            query.ViewFields = "";
+                            SPListItemCollection items = lConfiguracionProceso.GetItems(query);
+                            itmConfiguracionProcesoSiguiente = items[0];
+                        }
+
+                        if (idTarea != 0)
+                        {
+                            idSector = Convert.ToInt32(itmConfiguracionProcesoSiguiente["Sector"].ToString().Split(';')[0].ToString());
+                        }
+                        else
+                        {
+                            SPList lConfiguracionSolicitudes = SPContext.Current.Web.Lists["Configuración Circuitos Solicitudes"];
+                            SPQuery query = new SPQuery();
+                            query.Query = "<Where><Eq><FieldRef Name=\"Title\" /><Value Type=\"Text\">" + sTipoSolicitud + "</Value></Eq></Where>";
+                            query.RowLimit = 1;
+                            query.ViewFields = "";
+                            SPListItemCollection items = lConfiguracionSolicitudes.GetItems(query);
+                            SPListItem item = items[0];
+                            SPFieldLookupValueCollection lkSectorAlta = new SPFieldLookupValueCollection(item["Sector alta"].ToString());
+                            idSector = lkSectorAlta[0].LookupId;
+                        }
+                        
+                        imSector = lSectores.GetItemById(idSector);
+
+                        String strMensaje = txtMensaje.Text.ToString();
+                        if (rblAccion.SelectedValue == "2")
+                        {
+                            strMensaje = strMensaje + " - Materiales: ";
+                            foreach (ListItem itemTarea in cblSeleccionMaterial.Items)
+                            {
+                                if (itemTarea.Selected == true)
+                                {
+                                    strMensaje = strMensaje + itemTarea.Text.ToString() + "; ";
+                                }
+                            }
+                            //strMensaje = strMensaje + " - Tarea Destino: " + ddlSeleccioneTarea.SelectedItem.Text.ToString();
+                        }
+
+                        if (rblAccion.SelectedValue == "3")
+                        {
+                            strMensaje = strMensaje + " - Materiales: ";
+                            foreach (ListItem itemTarea in cblSeleccionMaterial.Items)
+                            {
+                                if (itemTarea.Selected == true)
+                                {
+                                    strMensaje = strMensaje + itemTarea.Text.ToString() + "; ";
+                                }
+                            }
+                            //strMensaje = strMensaje + " - Tarea Destino: " + ddlSeleccioneTarea.SelectedItem.Text.ToString();
+                        }
+
+
+                        // Inicializo la tarea siguiente
                         SPListItem itmTareaBitacora = lBitacora.AddItem();
-                        itmTareaBitacora["Title"] = itmConfiguracionProcesoSiguiente.Title.ToString();
+
+                        itmTareaBitacora["Title"] = itmConfiguracionProcesoSiguiente["Título Reinicio"];
                         itmTareaBitacora["Solicitud asociada"] = idDocument;
                         itmTareaBitacora["Iteración"] = 1;
                         itmTareaBitacora["Asignado"] = imSector["Usuarios"];
@@ -450,9 +704,15 @@ namespace GtionPackaging_Solicitudes.Layouts.SolicitudesDiseno
                         itmTareaBitacora["Fecha de Fin"] = Funciones_Comunes.dtFechaVencimiento(Convert.ToInt32(itmConfiguracionProcesoSiguiente["Días Vencimiento"].ToString()));
                         itmTareaBitacora["Tarea Agrupadora"] = itmConfiguracionProcesoSiguiente["Tarea Agrupadora"];
                         itmTareaBitacora["Ver"] = itmDocumento["Ver"].ToString();
-                        itmTareaBitacora["Sector"] = itmConfiguracionProcesoSiguiente["Sector"].ToString().Split('#')[1].ToString();
-                        itmTareaBitacora["Mensaje"] = txtMensaje.Text.ToString();
-                        itmTareaBitacora["Circuito Completo"] = rblCircuito.SelectedValue.ToString();
+                        itmTareaBitacora["Sector"] = imSector.Title.ToString();
+                        itmTareaBitacora["Mensaje"] = strMensaje;
+                        if (idTarea != 0) { 
+                            itmTareaBitacora["Circuito Completo"] = "NO";
+                        }
+                        else
+                        {
+                            itmTareaBitacora["Circuito Completo"] = "SI";
+                        }
                         itmTareaBitacora.Update();
 
                     }
@@ -461,7 +721,49 @@ namespace GtionPackaging_Solicitudes.Layouts.SolicitudesDiseno
 
 
         }
-        
+
+        private void vActualizarMaterialAjustes(String strCodigoSAP)
+        {
+            idDocument = Convert.ToInt32(Request["ID"]);
+
+            // Obtengo el usuario con el que me conecto
+            SPUser currentUser = SPContext.Current.Web.CurrentUser;
+            Errores.Text = Errores.Text + currentUser.Name.ToString();
+
+            Guid siteId = SPContext.Current.Site.ID;
+            Guid webId = SPContext.Current.Web.ID;
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
+            {
+                using (SPSite site = new SPSite(siteId))
+                {
+                    using (SPWeb web = site.OpenWeb(webId))
+                    {
+                        web.AllowUnsafeUpdates = true;
+
+                        SPQuery qryMateriales = new SPQuery();
+                        SPList lProductosMateriales = web.Lists["Solicitud - Producto Material"];
+                        String strQuery = "";
+                        strQuery = "<Where><And><Eq><FieldRef Name='Solicitud' LookupId='TRUE'/><Value Type='Lookup'>" + idDocument.ToString() + "</Value></Eq><Contains><FieldRef Name='C_x00f3_digo_x0020_SAP' /><Value Type='Text'>" + strCodigoSAP + "</Value></Contains></And></Where>";
+                        qryMateriales.Query = strQuery;
+
+                        SPListItemCollection lstProductosMateriales = lProductosMateriales.GetItems(qryMateriales);
+                        if (lstProductosMateriales.Count != 0)
+                        {
+                            foreach (SPListItem itmProductoMaterial in lstProductosMateriales)
+                            {
+                                
+                                itmProductoMaterial["Requiere Ajustes"] = 1;
+                                itmProductoMaterial.Update();
+                            }
+                        }
+
+
+                            }
+                }
+            });
+        }
+                    
+
         protected void rblAccion_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (rblAccion.SelectedValue == "0"){
@@ -476,14 +778,22 @@ namespace GtionPackaging_Solicitudes.Layouts.SolicitudesDiseno
                 ddlSeleccioneTarea.Visible = true;
                 ddlSeleccioneTarea.SelectedIndex  = 0;
                 cblSeleccionMaterial.Visible = false;
-                rblCircuito.Visible = true;
+                rblCircuito.Visible = false;
             }
             if (rblAccion.SelectedValue == "2")
             {
-                lblSeleccioneTarea.Visible = true;
+                lblSeleccioneTarea.Visible = false;
+                ddlSeleccioneTarea.Visible = false;
+                rblCircuito.Visible = false;
                 cblSeleccionMaterial.Visible = true;
-                ddlSeleccioneTarea.Visible = true;
-                rblCircuito.Visible = true;
+                ddlSeleccioneTarea.SelectedIndex = 0;
+            }
+            if (rblAccion.SelectedValue == "3")
+            {
+                lblSeleccioneTarea.Visible = false;
+                cblSeleccionMaterial.Visible = true;
+                ddlSeleccioneTarea.Visible = false;
+                rblCircuito.Visible = false;
                 ddlSeleccioneTarea.SelectedIndex = 0;
             }
         }

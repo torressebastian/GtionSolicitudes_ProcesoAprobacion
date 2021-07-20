@@ -46,6 +46,9 @@
                 <asp:boundfield datafield="C_x00f3_digo_x0020_SAP" headertext="Código SAP"  />
                 <asp:boundfield datafield="Modificaci_x00f3_n" headertext="Modificación a Realizar"  />
                 <asp:boundfield datafield="Motivo" headertext="Motivo"  />
+                <asp:boundfield datafield="Recursos_x0020_utilizados" headertext="Recursos Utilizados"  />
+                <asp:boundfield datafield="Cantidad_x0020_Blisters" headertext="Cantidad de Blisters"  />
+                <asp:boundfield datafield="Criterio_x0020_Unificaci_x00f3_n" headertext="Criterio Unificación"  />
                 <asp:boundfield datafield="Datos_x0020_de_x0020_Cobertura" headertext="Datos de Cobertura"  />
             </columns>
         </asp:gridview> 
@@ -83,6 +86,18 @@
                 </asp:TableRow>
                         
             <asp:TableRow ID="tbrDatoCobertura">
+                <asp:TableCell ColumnSpan="2" ID="cellRecursosUtilizados"> 
+                    <asp:Label ID="lblRecursosUtilizados" runat="server">Recursos Utilizados:</asp:Label><br />
+                    <asp:TextBox ID="txtRecursosUtilizados" runat="server" CssClass="ms-long" Width="90%" ></asp:TextBox>
+                </asp:TableCell>
+                <asp:TableCell ID="cellCantidadBlister"> 
+                    <asp:Label ID="lblCantidadBlister" runat="server">Cantidad de Blisters:</asp:Label><br />
+                    <asp:TextBox ID="txtCantidadBlister" runat="server" CssClass="ms-input" ></asp:TextBox>
+                </asp:TableCell>
+                <asp:TableCell ColumnSpan="2" ID="cellCriterioUnificacion">
+                    <asp:Label ID="lblCriterioUnificacion" runat="server">Criterio de Unificación:</asp:Label><br />
+                    <asp:TextBox ID="txtCriterioUnificacion" runat="server" CssClass="ms-long" Width="90%" ></asp:TextBox>
+                </asp:TableCell>
                 <asp:TableCell ColumnSpan="2">
                     <asp:Label ID="lblDatosCobertura" runat="server">Datos de Cobertura:</asp:Label><br />
                     <asp:TextBox ID="txtDatosCobertura" runat="server" CssClass="ms-long" Width="90%"></asp:TextBox>                
@@ -107,14 +122,14 @@
         <RowStyle Font-Size="10pt" Font-Names="Tahoma" BorderStyle="Solid" BorderWidth="1" BorderColor="#339966"  />
         <AlternatingRowStyle CssClass="ms-alternating"/>
             <columns>
-            <asp:boundfield datafield="ID" headertext="-" Visible="true" ItemStyle-ForeColor="White"><ItemStyle Width="1px" HorizontalAlign="Left" /></asp:boundfield>
+            <asp:boundfield datafield="ID" headertext="-" Visible="true" ItemStyle-ForeColor="White"><ItemStyle Font-Size="XX-Small"  Width="1px" HorizontalAlign="Left" /></asp:boundfield>
             <asp:buttonfield ButtonType="Image" CommandName="EditarMaterial" DataTextField="ID" headertext=""  ImageUrl="../images/edititem.gif" ><ItemStyle Width="20px" HorizontalAlign="Center" /></asp:buttonfield>
-                <asp:boundfield datafield="Producto" headertext="Material Reemplazado"  />
-<%--                <asp:TemplateField HeaderText="Producto">
+                <%--<asp:boundfield datafield="Producto" headertext="Material Reemplazado"  />--%>
+              <asp:TemplateField HeaderText="Producto">
                     <ItemTemplate>
                         <%# RemoveCharactersModif(Eval("Producto_x003a_Nombre").ToString())%>
                     </ItemTemplate>
-                </asp:TemplateField>--%>
+                </asp:TemplateField>
 	            <asp:boundfield datafield="Title" headertext="Material Reemplazante"  />
                 <asp:boundfield datafield="Tipo_x0020_Material" headertext="Tipo Material"  />
                 <asp:boundfield datafield="C_x00f3_digo_x0020_SAP" headertext="Código SAP"  />
@@ -128,7 +143,7 @@
                 <asp:boundfield datafield="C_x00f3_digo_x0020_de_x0020_Espe" headertext="Código Especificación"  />
                 <asp:boundfield datafield="C_x00f3_digo_x0020_de_x0020_Meto" headertext="Código Metodología Analítica"  />
                 <asp:boundfield datafield="Datos_x0020_de_x0020_Cobertura" headertext="Datos de Cobertura"  />
-
+                <asp:boundfield datafield="Requiere_x0020_Ajustes" headertext="-" Visible="true" ItemStyle-ForeColor="White"><ItemStyle Width="1px" Font-Size="XX-Small" HorizontalAlign="Left" /></asp:boundfield>
             </columns>
         </asp:gridview> 
         <asp:Table ID="Table1" runat="server" Width="100%" CssClass="ms-bottompaging">

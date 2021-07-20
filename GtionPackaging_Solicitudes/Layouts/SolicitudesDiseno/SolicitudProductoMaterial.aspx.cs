@@ -75,6 +75,10 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                             }
                         }
 
+                        if (strEstadoSolicitud == "Reinicio Pendiente")
+                        {
+                            bInicioProceso = true;
+                        }
                         
 
                         if (bInicioProceso == true) {
@@ -711,7 +715,20 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                     imgSiguienteMaterial.Visible = true;
                 }
 
-                
+                if (GridViewMateriales.Rows.Count != 0)
+                {
+                    foreach (GridViewRow row in GridViewMateriales.Rows)
+                    {
+                        if (row.Cells[16].Text.ToString() == "1")
+                        {
+                            row.BackColor = System.Drawing.Color.Orange;
+                            row.Cells[16].ForeColor = System.Drawing.Color.Orange;
+                            row.Cells[0].ForeColor = System.Drawing.Color.Orange;
+                        }
+                    }
+                }
+
+
             }
 
             if (strEstadoSolicitud == "Pendiente Inicio Packaging")
@@ -768,6 +785,9 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
         {
             if (e.CommandName == "EditarMaterial")
             {
+
+                LimpiarPanelMateriales();
+
                 lblMensajeErrorMaterial.Visible = false;
                 int index = Convert.ToInt32(e.CommandArgument);
                 GridViewRow row = GridViewMateriales.Rows[index];
@@ -1106,40 +1126,44 @@ namespace SolicitudesDiseno_Solicitudes.Layouts.SolicitudesDiseno
                 }
             }
             if (bResult == true) {
-                SPQuery qryTareas = new SPQuery();
-                SPList lstList;
-                String strQuery = "";
-                lstList = SPContext.Current.Web.Lists["Solicitud - Producto Material"];
-                qryTareas = new SPQuery(lstList.Views["Todos los elementos"]);
-
-                String sOrden = string.Format("<OrderBy><FieldRef Name='{0}' Ascending='{1}' /></OrderBy>", "ID", "False");
-                strQuery = "<Eq><FieldRef Name='C_x00f3_digo_x0020_SAP' /><Value Type='Text'>" + txtMaterialCodigoSAP.Text.ToString().TrimEnd() + "</Value></Eq>";
-
-                if (!string.IsNullOrEmpty(strQuery))
+                if (txtMaterialCodigoSAP.Text.ToString().TrimEnd() != "N/A")
                 {
-                    strQuery = "<Where>" + strQuery + "</Where>";
-                }
+                    SPQuery qryTareas = new SPQuery();
+                    SPList lstList;
+                    String strQuery = "";
+                    lstList = SPContext.Current.Web.Lists["Solicitud - Producto Material"];
+                    qryTareas = new SPQuery(lstList.Views["Todos los elementos"]);
 
-                qryTareas.Query = strQuery;
-                qryTareas.RowLimit = 500;
+                    String sOrden = string.Format("<OrderBy><FieldRef Name='{0}' Ascending='{1}' /></OrderBy>", "ID", "False");
+                    strQuery = "<Eq><FieldRef Name='C_x00f3_digo_x0020_SAP' /><Value Type='Text'>" + txtMaterialCodigoSAP.Text.ToString().TrimEnd() + "</Value></Eq>";
 
-                SPListItemCollection lstMateriales = lstList.GetItems(qryTareas);
-                foreach (SPListItem str in lstMateriales)
-                {
-                    if (Convert.ToInt32(str["Solicitud"].ToString().Split(';')[0].ToString()) != idDocument) {
-                        SPList lSolicitudes = SPContext.Current.Web.Lists["Solicitudes"];
-                        SPListItem itmSolicitud = lSolicitudes.GetItemById(Convert.ToInt32(str["Solicitud"].ToString().Split(';')[0].ToString()));
-                        if (itmSolicitud["Estado"].ToString() != "Cancelado") {
-                            bResult = false;
-                            lblMensajeErrorMaterial.Text = "El Código SAP ingresado está asociado a otro material. Solicitud: " + itmSolicitud.Title.ToString();
-                            txtMaterialCodigoSAP.Focus();
-                            break;
-                        }
+                    if (!string.IsNullOrEmpty(strQuery))
+                    {
+                        strQuery = "<Where>" + strQuery + "</Where>";
                     }
-                        
 
+                    qryTareas.Query = strQuery;
+                    qryTareas.RowLimit = 500;
+
+                    SPListItemCollection lstMateriales = lstList.GetItems(qryTareas);
+                    foreach (SPListItem str in lstMateriales)
+                    {
+                        if (Convert.ToInt32(str["Solicitud"].ToString().Split(';')[0].ToString()) != idDocument)
+                        {
+                            SPList lSolicitudes = SPContext.Current.Web.Lists["Solicitudes"];
+                            SPListItem itmSolicitud = lSolicitudes.GetItemById(Convert.ToInt32(str["Solicitud"].ToString().Split(';')[0].ToString()));
+                            if (itmSolicitud["Estado"].ToString() != "Cancelado")
+                            {
+                                bResult = false;
+                                lblMensajeErrorMaterial.Text = "El Código SAP ingresado está asociado a otro material. Solicitud: " + itmSolicitud.Title.ToString();
+                                txtMaterialCodigoSAP.Focus();
+                                break;
+                            }
+                        }
+
+
+                    }
                 }
-
 
             }
 

@@ -89,7 +89,7 @@ namespace GtionPackaging_Solicitudes
         private static ArrayList GetADGroupUsers(string groupName)
         {
             ArrayList userNames = new ArrayList();
-            PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
+            PrincipalContext ctx = new PrincipalContext(ContextType.Domain, "Baliarda.com", "sharepointservice", "Shrp8451");
             GroupPrincipal group = GroupPrincipal.FindByIdentity(ctx, groupName.Replace("Baliarda\\", "").ToString());
 
             if (group != null)

@@ -100,7 +100,7 @@
                 <asp:TableCell ColumnSpan="3">
                     <asp:Button runat="server" Id="btnGuardarComentario" Visible="true" Text="Guardar Comentario" OnClick="btnGuardarComentario_Click" Width="200px" />
                     <asp:Button runat="server" Id="btnInformacionMateriales" Text="Información Producto / Materiales"  OnClick="btnInformacionMateriales_Click" Width="200px" />
-                    <asp:Button runat="server" Id="btnIniciarProceso" Text="Iniciar Proceso" OnClick="btnIniciarProceso_Click" Width="200px" />
+                    <asp:Button runat="server" Id="btnIniciarProceso" Text="Iniciar Proceso" OnClientClick="this.disabled=true;" UseSubmitBehavior="false" OnClick="btnIniciarProceso_Click" Width="200px" />
                     <asp:Button runat="server" Id="btnCancelarProceso" Text="Cancelar Proceso" OnClick="btnCancelarProceso_Click" Width="200px" />
                     <asp:Button runat="server" Id="btnReenviarSolicitud" Text="Requerir Ajustes a la Solicitud" OnClick="btnReenviarSolicitur_Click" Width="200px" />
                 </asp:TableCell>
@@ -127,6 +127,14 @@
                 <asp:TableCell runat="server" Width="15%" BorderStyle="None"><SharePoint:InputFormTextBox runat="server" BorderStyle="None" Width="100%" Enabled="false" Font-Bold="true" ID="txtFechaFin"/></asp:TableCell>
             </asp:TableRow>
         </asp:Table>  
+        <asp:Table ID="tblMensajeReprocesar" runat="server" Width="100%">
+            <asp:TableHeaderRow BackColor="#009933">
+                <asp:TableHeaderCell runat="server" HorizontalAlign="Left" ForeColor="White">Ajustes Solicitados:</asp:TableHeaderCell>
+            </asp:TableHeaderRow>
+            <asp:TableRow>
+                <asp:TableCell runat="server" Width="100%" BorderStyle="None"><SharePoint:InputFormTextBox runat="server" Width="99%" Enabled="false" ID="txtMensaje" TextMode="MultiLine" RichText="false" Font-Bold="true" Rows="3" ></SharePoint:InputFormTextBox></asp:TableCell>
+                </asp:TableRow>
+        </asp:Table>
                 <asp:Table ID="tblDatosAprobacionTareaActual" runat="server" Width="100%">
             <asp:TableHeaderRow BackColor="#009933">
                 <asp:TableHeaderCell runat="server" HorizontalAlign="Left" ForeColor="White">Comentarios:</asp:TableHeaderCell>
@@ -168,10 +176,10 @@
                 <asp:Button runat="server" Id="btnEditarMateriales" Text="Editar Producto / Material" Width="150px" OnClick="btnInformacionMateriales_Click" />
                 <asp:Button runat="server" Id="btnGuardar" Text="Guardar Borrador" Width="150px" OnClick="btnGuardar_Click"/>
                 <asp:Button runat="server" Id="btnAprobar" Text="Completar Tarea" Width="150px" OnClick="btnAprobar_Click" />
-                
+                <asp:Button runat="server" Id="btnRechazar" Text="Cerrar Caso" Width="150px" OnClick="btnRechazar_Click"/>
 
                 </asp:TableCell><asp:TableCell HorizontalAlign="Right">
-                <%--<asp:Button runat="server" Id="btnRechazar" Text="Rechazar" OnClick="btnRechazar_Click"/>--%>
+                
                 <asp:Button runat="server" Id="btnCambiarCorrector" Text="Reasignar Tarea" Width="150px" OnClick="btnCambiarCorrector_Click"/>
                     <asp:Button runat="server" ID="btnReenviar" Text="Reenvio Mail" Width="150px" OnClick="btnReenviar_Click" />
             </asp:TableCell></asp:TableRow>
@@ -196,6 +204,7 @@
     <asp:HiddenField ID="IdTareaBitacora" runat="server" EnableViewState="true" />
     <asp:HiddenField ID="AdjuntoObligatorio" runat="server" EnableViewState="true" />
     <asp:HiddenField ID="ValidaMateriales" runat="server" EnableViewState="true" />
+    <asp:HiddenField ID="TareaReinicio" runat="server" EnableViewState="true" />
     <asp:HiddenField ID="Sector" runat="server" EnableViewState="true" />
     <asp:HiddenField ID="strNombreSector" runat="server" EnableViewState="true" />
     <asp:HiddenField ID="strNombreInterno" runat="server" EnableViewState="true" />
